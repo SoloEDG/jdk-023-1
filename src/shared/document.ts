@@ -113,6 +113,13 @@ export interface RunMeta {
   storageWarned: boolean
 }
 
+export interface PracticeMeta {
+  ballsServed: number
+  spawnX: number
+  spawnY: number
+  atPlunger: boolean
+}
+
 export interface PinballDocument {
   phase: Phase
   phaseBeforePause: Phase | null
@@ -134,6 +141,7 @@ export interface PinballDocument {
   note: NoteState
   run: RunMeta
   signals: { drain: boolean }
+  practice: PracticeMeta | null
 }
 
 export function defaultCareer(): CareerState {
@@ -176,6 +184,7 @@ export function createDocument(): PinballDocument {
     note: { text: '', ms: 0 },
     run: { launched: false, committed: false, playMs: 0, storedScore: 0, storageWarned: false },
     signals: { drain: false },
+    practice: null,
   }
 }
 

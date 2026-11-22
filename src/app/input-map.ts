@@ -12,13 +12,23 @@ export interface InputController {
   pulseNudge: (direction: -1 | 1) => void
   pulsePause: () => void
   pulseRestart: () => void
+  pulsePractice: () => void
+  pulseServe: () => void
   destroy: () => void
 }
 
 export function createInputController(target: Window): InputController {
   const keys = { left: false, right: false, plunger: false }
   const pointer = { left: false, right: false, plunger: false }
-  const edges = { nudgeLeft: false, nudgeRight: false, pause: false, restart: false, plungerReleased: false }
+  const edges = {
+    nudgeLeft: false,
+    nudgeRight: false,
+    pause: false,
+    restart: false,
+    plungerReleased: false,
+    practice: false,
+    serve: false,
+  }
 
   function onKeyDown(event: KeyboardEvent): void {
     if (event.repeat) return
@@ -29,6 +39,8 @@ export function createInputController(target: Window): InputController {
     if (event.code === 'KeyQ') edges.nudgeLeft = true
     if (event.code === 'KeyE') edges.nudgeRight = true
     if (event.code === 'KeyP' || event.code === 'Escape') edges.pause = true
+    if (event.code === 'KeyT') edges.practice = true
+    if (event.code === 'KeyR') edges.serve = true
   }
 
   function onKeyUp(event: KeyboardEvent): void {
@@ -75,12 +87,16 @@ export function createInputController(target: Window): InputController {
         nudgeRight: edges.nudgeRight,
         pauseEdge: edges.pause,
         restartEdge: edges.restart,
+        practiceEdge: edges.practice,
+        serveEdge: edges.serve,
       }
       edges.nudgeLeft = false
       edges.nudgeRight = false
       edges.pause = false
       edges.restart = false
       edges.plungerReleased = false
+      edges.practice = false
+      edges.serve = false
       return frame
     },
     setLeft(down: boolean): void {
@@ -105,6 +121,12 @@ export function createInputController(target: Window): InputController {
     },
     pulseRestart(): void {
       edges.restart = true
+    },
+    pulsePractice(): void {
+      edges.practice = true
+    },
+    pulseServe(): void {
+      edges.serve = true
     },
     destroy(): void {
       target.removeEventListener('keydown', onKeyDown)

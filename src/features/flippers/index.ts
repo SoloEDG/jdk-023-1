@@ -5,7 +5,7 @@ import { advanceFlippers } from '@/features/flippers/lib/flipper-kinematics'
 import { advancePlunger, applyNudges, decayNudgeFlash } from '@/features/flippers/lib/plunger-nudge'
 
 export { advanceFlippers } from '@/features/flippers/lib/flipper-kinematics'
-export { advancePlunger, applyNudges, clearWarnings, decayNudgeFlash } from '@/features/flippers/lib/plunger-nudge'
+export { advancePlunger, applyNudges, clearWarnings, decayNudgeFlash, firePlunger } from '@/features/flippers/lib/plunger-nudge'
 export { default as ControlDeck } from '@/features/flippers/ui/ControlDeck.vue'
 export { default as TiltLamp } from '@/features/flippers/ui/TiltLamp.vue'
 

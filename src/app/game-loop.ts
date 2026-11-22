@@ -3,20 +3,25 @@ import type { PinballDocument } from '@/shared/document'
 import { absorbZones, tickBonus } from '@/features/bonus'
 import { advanceControls } from '@/features/flippers'
 import { persist, syncRecords } from '@/features/records'
+import { runPracticeFrame } from '@/features/practice'
 import { simulateBall } from '@/features/scoring'
 import { anchors, consumeContacts, publishGates, sampleRamp, sampleScoop, stickPlunger, syncTable } from '@/features/table'
 import { applyDrain, restartGame, togglePause } from '@/app/cabinet-actions'
 
-export function runFrame(doc: PinballDocument, input: FrameInput, dtMs: number): void {
-  const command = commandFromInput(input)
-  if (command?.type === 'restart') {
-    restartGame(doc)
-    return
-  }
-  if (command?.type === 'pause-toggle') {
-    togglePause(doc)
-    return
-  }
+export interface PracticeHooks {
+  enter: () => void
+  exit: () => void
+  serve: () => void
+  reset: () => void
+}
+
+export interface LoopSessions {
+  formal: () => PinballDocument
+  practice: () => PinballDocument | null
+  hooks: PracticeHooks
+}
+
+function runFormalFrame(doc: PinballDocument, input: FrameInput, dtMs: number): void {
   if (doc.phase !== 'paused' && doc.note.ms > 0) doc.note.ms -= dtMs
   if (doc.phase === 'paused' || doc.phase === 'gameover') return
 
@@ -37,19 +42,60 @@ export function runFrame(doc: PinballDocument, input: FrameInput, dtMs: number):
   syncRecords(doc)
 }
 
-export function startLoop(doc: PinballDocument, pull: () => FrameInput): () => void {
+export function runFrame(sessions: LoopSessions, input: FrameInput, dtMs: number): void {
+  const practiceDoc = sessions.practice()
+
+  const command = commandFromInput(input)
+  if (command?.type === 'restart') {
+    if (practiceDoc) {
+      sessions.hooks.reset()
+      return
+    }
+    restartGame(sessions.formal())
+    return
+  }
+  if (command?.type === 'pause-toggle') {
+    if (practiceDoc) {
+      sessions.hooks.exit()
+      return
+    }
+    togglePause(sessions.formal())
+    return
+  }
+  if (command?.type === 'practice-toggle') {
+    if (practiceDoc) sessions.hooks.exit()
+    else sessions.hooks.enter()
+    return
+  }
+  if (command?.type === 'practice-serve') {
+    if (practiceDoc) sessions.hooks.serve()
+    return
+  }
+
+  if (practiceDoc) {
+    runPracticeFrame(practiceDoc, input, dtMs)
+    return
+  }
+  runFormalFrame(sessions.formal(), input, dtMs)
+}
+
+export function startLoop(sessions: LoopSessions, pull: () => FrameInput): () => void {
   let last = performance.now()
   let handle = 0
-  const onHide = (): void => {
-    if (document.hidden) persist(doc)
+  const persistFormal = (): void => {
+    const practice = sessions.practice()
+    if (!practice) persist(sessions.formal())
   }
-  const onLeave = (): void => persist(doc)
+  const onHide = (): void => {
+    if (document.hidden) persistFormal()
+  }
+  const onLeave = (): void => persistFormal()
   document.addEventListener('visibilitychange', onHide)
   window.addEventListener('pagehide', onLeave)
   const tick = (now: number): void => {
     const step = Math.min(32, Math.max(0, now - last))
     last = now
-    runFrame(doc, pull(), step)
+    runFrame(sessions, pull(), step)
     handle = requestAnimationFrame(tick)
   }
   handle = requestAnimationFrame(tick)

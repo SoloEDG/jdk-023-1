@@ -310,3 +310,61 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   0%, 100% { opacity: 0.35; }
   50% { opacity: 1; }
 }
+
+/* ---- 练习模式 ---- */
+.practice-hud {
+  border-color: #78e6ff;
+  box-shadow: inset 0 0 0 2px #17414d;
+}
+
+.practice-eyebrow {
+  margin: 0 0 4px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: #78e6ff;
+}
+
+.practice-marquee {
+  margin: 6px 0 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: #78e6ff;
+}
+
+.hall-practice .table-glass {
+  border-color: #17414d;
+  box-shadow: inset 0 0 0 3px #78e6ff;
+}
+
+.table-glass-practice { cursor: crosshair; }
+
+.practice-bar {
+  border: 1px solid #3d8a9c;
+  background: #eafaff;
+}
+
+.spawn-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.spawn-key {
+  border: 1px solid #3d8a9c;
+  background: #fff6e8;
+  color: #17414d;
+  min-height: 40px;
+}
+
+.spawn-key:hover { background: #78e6ff; }
+
+.practice-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.practice-actions .text-key { min-height: 44px; }

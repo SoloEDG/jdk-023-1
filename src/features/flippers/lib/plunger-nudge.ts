@@ -18,16 +18,22 @@ export function advancePlunger(doc: PinballDocument, input: FrameInput, dtMs: nu
     doc.plunger.charging = false
   }
   if (!input.plungerReleased || doc.ball.held !== 'plunger') return
+  firePlunger(doc)
+  if (doc.phase === 'ready') {
+    doc.phase = 'playing'
+    doc.run.launched = true
+  }
+}
+
+/** 以当前蓄力（至少 0.2 成力）把球从发射槽打出。 */
+export function firePlunger(doc: PinballDocument): number {
   const power = Math.max(doc.plunger.power, 0.2)
   doc.ball.held = 'none'
   doc.ball.vy = -(980 + power * 1100)
   doc.ball.vx = -24
   doc.plunger.power = 0
   doc.plunger.charging = false
-  if (doc.phase === 'ready') {
-    doc.phase = 'playing'
-    doc.run.launched = true
-  }
+  return power
 }
 
 function bump(doc: PinballDocument, direction: -1 | 1): void {

@@ -222,6 +222,37 @@ function bonusWash(ctx: CanvasRenderingContext2D, doc: PinballDocument): void {
   ctx.strokeRect(24, 28, VIEW.w - 48, VIEW.h - 52)
 }
 
+function spawnMark(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+  ctx.save()
+  ctx.strokeStyle = 'rgba(120,230,255,0.95)'
+  ctx.fillStyle = 'rgba(120,230,255,0.18)'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.arc(x, y, 14, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(x - 20, y)
+  ctx.lineTo(x + 20, y)
+  ctx.moveTo(x, y - 20)
+  ctx.lineTo(x, y + 20)
+  ctx.stroke()
+  ctx.restore()
+}
+
+function practiceWash(ctx: CanvasRenderingContext2D, doc: PinballDocument): void {
+  if (!doc.practice) return
+  ctx.strokeStyle = 'rgba(120,230,255,0.95)'
+  ctx.lineWidth = 6
+  ctx.setLineDash([14, 10])
+  ctx.strokeRect(20, 24, VIEW.w - 40, VIEW.h - 46)
+  ctx.setLineDash([])
+  ctx.fillStyle = 'rgba(120,230,255,0.95)'
+  ctx.font = '600 15px "IBM Plex Mono", monospace'
+  ctx.fillText('练习模式 · 不计分不记档', 30, 48)
+  spawnMark(ctx, doc.practice.spawnX, doc.practice.spawnY)
+}
+
 export function paintTable(ctx: CanvasRenderingContext2D, doc: PinballDocument, width: number, height: number): void {
   ctx.clearRect(0, 0, width, height)
   ctx.save()
@@ -242,5 +273,6 @@ export function paintTable(ctx: CanvasRenderingContext2D, doc: PinballDocument, 
   flippersOf(ctx, doc)
   ballOf(ctx, doc)
   bonusWash(ctx, doc)
+  practiceWash(ctx, doc)
   ctx.restore()
 }

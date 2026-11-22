@@ -4,6 +4,8 @@ const props = defineProps<{
   plungerReady: boolean
   paused: boolean
   canPause: boolean
+  practicing: boolean
+  canEnterPractice: boolean
 }>()
 
 const emit = defineEmits<{
@@ -14,6 +16,7 @@ const emit = defineEmits<{
   nudgeRight: []
   pause: []
   restart: []
+  practice: []
 }>()
 
 function capture(event: PointerEvent, down: boolean): void {
@@ -75,9 +78,20 @@ function holdPlunger(event: PointerEvent, down: boolean): void {
     </button>
     <div class="lock-actions">
       <button type="button" class="text-key" :disabled="!canPause" @click="emit('pause')">
-        {{ paused ? '继续' : '暂停' }}
+        {{ practicing ? '退出练习' : paused ? '继续' : '暂停' }}
       </button>
-      <button type="button" class="text-key text-key-strong" @click="emit('restart')">重开一局</button>
+      <button
+        v-if="!practicing"
+        type="button"
+        class="text-key"
+        :disabled="!canEnterPractice"
+        @click="emit('practice')"
+      >
+        进入练习
+      </button>
+      <button type="button" class="text-key text-key-strong" @click="emit('restart')">
+        {{ practicing ? '重置练习' : '重开一局' }}
+      </button>
     </div>
   </div>
 </template>
